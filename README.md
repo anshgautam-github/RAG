@@ -1,96 +1,179 @@
-# RAG — FAQ: Data Ingestion & Indexing
 
-A short FAQ about data ingestion for Retrieval-Augmented Generation (RAG).  
-Click any question below to jump to the answer, or expand the answer inline.
-
----
-
-## Table of contents
-
-1. [What is data ingestion in the context of RAG?](#what-is-data-ingestion-in-the-context-of-rag)  
-2. [What is “Normalizing Data”?](#what-is-normalizing-data)  
-3. [What does “Indexed” mean?](#what-does-indexed-mean)  
-
----
-
-<a name="what-is-data-ingestion-in-the-context-of-rag"></a>
-## 1. What is data ingestion in the context of RAG?
-
-<details>
-<summary>Answer — click to expand</summary>
-
-Data ingestion is the process of reading, collecting, and normalizing data from various sources (PDFs, DOCX, text files, web pages, databases) into a consistent internal representation (documents) that can be indexed and used by the retrieval and generation parts of a RAG pipeline.  
-
-In RAG specifically, ingestion includes:
-
-- Loading files  
-- Extracting text  
-- Cleaning/normalizing content  
-- Adding metadata  
-- Optionally splitting into chunks  
-- Preparing the items for embedding into vectors
-
-It’s foundational because retrieval quality depends on how well the content was prepared.
+Produces natural, context-preserving chunks.
 
 </details>
 
 ---
 
-<a name="what-is-normalizing-data"></a>
-## 2. What is “Normalizing Data”?
+<a name="10"></a>
+## 10. Is metadata embedded along with the text?
 
 <details>
 <summary>Answer — click to expand</summary>
 
-**Normalizing data** means cleaning and standardizing the text before using it for chunking, embedding, and retrieval.
+No.
 
-In RAG, normalization typically includes:
+Only text (`page_content`) is embedded.  
+Metadata stays separate for filtering, provenance, and context.
 
-- Removing unwanted characters (extra spaces, line breaks, weird symbols)  
-- Fixing inconsistent formatting (e.g., converting all quotes to a standard format)  
-- Converting data to a uniform structure (e.g., `{text, metadata}` format)  
-- Making text consistent (e.g., lowercasing for certain pipelines)  
-- Removing boilerplate content (headers, footers, page numbers)  
-- Splitting paragraphs correctly
-
-**Why normalize?**  
-Because embeddings work best when the text is clean, consistent, and meaningful. If you feed messy text to the embedding model → retrieval quality drops.
+Embedding metadata would pollute semantic meaning.
 
 </details>
 
 ---
 
-<a name="what-does-indexed-mean"></a>
-## 3. What does “Indexed” mean?
+<a name="11"></a>
+## 11. What is the output type of a LangChain loader?
 
 <details>
 <summary>Answer — click to expand</summary>
 
-In RAG, **indexing** means taking your processed documents (chunks) and storing their embeddings inside a vector database so they can be retrieved efficiently.
+A list of **Document** objects, each containing:
 
-**Typical steps:**
+- `page_content`  
+- `metadata`
 
-1. Compute embeddings for each chunk (using an embedding model).  
-2. Store each embedding (vector) in a vector index such as:
-   - Pinecone  
-   - FAISS  
-   - Weaviate  
-   - ChromaDB  
-   - Milvus  
-3. The index organizes vectors so you can run fast similarity searches (find the closest vectors).
-
-**Why index?**  
-Without indexing the system would need to compare queries against every vector manually → extremely slow. The vector index makes retrieval fast and scalable.
+Metadata varies by loader.
 
 </details>
 
 ---
 
-## One-line summary
+<a name="12"></a>
+## 12. What metadata fields can a user add?
 
-- **Normalizing data** = cleaning + standardizing the text before chunking/embedding.  
-- **Indexed** = stored in a vector database in a way that enables fast similarity search.
+<details>
+<summary>Answer — click to expand</summary>
+
+Common metadata you can add:
+
+- `source` (filename or URL)  
+- `page` / `page_number`  
+- `author`  
+- `section`  
+- `created_date`  
+- `language`  
+- `document_type` (policy, blog, article)  
+- `tenant_id`  
+- `ocr_confidence`  
+
+Metadata supports filtering and transparency.
+
+</details>
 
 ---
 
+<a name="13"></a>
+## 13. Why is it dangerous to embed an entire PDF without chunking?
 
+<details>
+<summary>Answer — click to expand</summary>
+
+Embedding a whole PDF as one chunk is bad because:
+
+- Topics get mixed → blurry embedding  
+- Text may exceed token limits  
+- Wasteful computation  
+- No page-level accuracy  
+- Poor retrieval → entire document returned  
+
+**In short:**  
+Large chunk = messy, inaccurate retrieval.  
+Small chunk = clear meaning, better results.
+
+</details>
+
+---
+
+<a name="14"></a>
+## 14. When should I use different chunking styles?
+
+<details>
+<summary>Answer — click to expand</summary>
+
+### **Character-based**
+Use when text is clean and you want simple fixed cuts.
+
+### **Recursive (hierarchical)**
+Use for structured docs (PDFs, manuals, reports).  
+Best accuracy.
+
+### **Token-based**
+Use when exact token control matters (embeddings or LLM limits).
+
+**In short:**  
+- Character → simple  
+- Recursive → best  
+- Token-based → most precise
+
+</details>
+
+---
+
+<a name="15"></a>
+## 15. Why does recursive splitting produce more meaningful chunks?
+
+<details>
+<summary>Answer — click to expand</summary>
+
+It splits using larger boundaries first (paragraph → sentence → word → char).  
+This preserves coherence and keeps ideas intact.
+
+Better chunks → better embeddings.
+
+</details>
+
+---
+
+<a name="16"></a>
+## 16. Trade-offs of large vs small chunk sizes
+
+<details>
+<summary>Answer — click to expand</summary>
+
+### **Large chunks**
+Pros: more context, fewer vectors, cheaper search  
+Cons: topic mixing, token limits, less accurate retrieval
+
+### **Small chunks**
+Pros: precise retrieval, page-level accuracy  
+Cons: more vectors, more compute, may lose context
+
+Best practice → medium chunk size (200–500 tokens)
+
+</details>
+
+---
+
+<a name="17"></a>
+## 17. What metadata do common loaders return?
+
+<details>
+<summary>Answer — click to expand</summary>
+
+### **1. PDF loaders**
+- `source`, `page`, `total_pages`, `title`, `author`, `size`
+
+### **2. HTML/Web loaders**
+- `url`, `title`, `description`, `lang`, `html_path`, `last_modified`
+
+### **3. DOCX loaders**
+- `source`, `style`, `section`, `author`, `created_at`
+
+### **4. Text loaders**
+- `source`, `encoding`, `file_extension`
+
+### **5. OCR loaders**
+- `ocr_confidence`, `image_size`, `page_number`
+
+### **6. CSV/Excel loaders**
+- `row`, `column`, `sheet_name`
+
+### **7. JSON loaders**
+- `key_path`, `record_index`, `schema`
+
+Different file formats = different metadata.
+
+</details>
+
+---
