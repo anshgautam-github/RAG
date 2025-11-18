@@ -1,179 +1,193 @@
+# 📘 RAG — FAQ: Data Ingestion & Indexing
 
-Produces natural, context-preserving chunks.
-
-</details>
+A short FAQ about data ingestion for Retrieval-Augmented Generation (RAG).  
+Click any question below to jump to the answer, or expand the answer inline.
 
 ---
 
-<a name="10"></a>
-## 10. Is metadata embedded along with the text?
+# 📑 Table of Contents
+
+1. [What is data ingestion in the context of RAG?](#1)  
+2. [What is “Normalizing Data”?](#2)  
+3. [What does “Indexed” mean?](#3)  
+4. [Which LangChain object represents a piece of ingested data?](#4)  
+5. [What are the two components of a LangChain Document?](#5)  
+6. [Why must `page_content` always be a string?](#6)  
+7. [Why does LangChain enforce a fixed Document structure?](#7)  
+8. [How does metadata enhance search results?](#8)  
+9. [Difference between CharacterTextSplitter and RecursiveCharacterTextSplitter](#9)  
+10. [Is metadata embedded along with the text?](#10)  
+11. [What output do LangChain loaders produce?](#11)  
+12. [What metadata fields can a user add?](#12)  
+13. [Why is embedding an entire PDF dangerous?](#13)  
+14. [When should I use different chunking styles?](#14)  
+15. [Why does recursive splitting produce more meaningful chunks?](#15)  
+16. [Trade-offs of large vs small chunk sizes](#16)  
+17. [What metadata do common loaders return?](#17)
+
+---
+
+<a name="1"></a>
+## 1. What is data ingestion in the context of RAG?
 
 <details>
 <summary>Answer — click to expand</summary>
 
-No.
+Data ingestion is the process of reading, collecting, and normalizing data from various sources (PDFs, DOCX, text files, web pages, databases) into a consistent internal representation (documents) that can be indexed and used by RAG.
 
-Only text (`page_content`) is embedded.  
-Metadata stays separate for filtering, provenance, and context.
+It includes:
 
-Embedding metadata would pollute semantic meaning.
+- Loading files  
+- Extracting text  
+- Cleaning/normalizing content  
+- Adding metadata  
+- Splitting into chunks  
+- Preparing for embedding  
+
+Good ingestion = better retrieval quality.
 
 </details>
 
 ---
 
-<a name="11"></a>
-## 11. What is the output type of a LangChain loader?
+<a name="2"></a>
+## 2. What is “Normalizing Data”?
 
 <details>
 <summary>Answer — click to expand</summary>
 
-A list of **Document** objects, each containing:
+Normalizing means cleaning and standardizing text before chunking/embedding.
 
-- `page_content`  
-- `metadata`
+Includes:
 
-Metadata varies by loader.
+- Removing unwanted characters  
+- Fixing inconsistent formatting  
+- Structuring text into `{text, metadata}`  
+- Lowercasing (when needed)  
+- Removing headers, footers, page numbers  
+- Proper paragraph splitting  
+
+Clean text → better embeddings → better retrieval.
 
 </details>
 
 ---
 
-<a name="12"></a>
-## 12. What metadata fields can a user add?
+<a name="3"></a>
+## 3. What does “Indexed” mean?
 
 <details>
 <summary>Answer — click to expand</summary>
 
-Common metadata you can add:
+Indexing = storing embeddings in a vector database for fast similarity search.
 
-- `source` (filename or URL)  
-- `page` / `page_number`  
-- `author`  
-- `section`  
-- `created_date`  
-- `language`  
-- `document_type` (policy, blog, article)  
-- `tenant_id`  
-- `ocr_confidence`  
+Steps:
 
-Metadata supports filtering and transparency.
+1. Compute embeddings  
+2. Store in a vector index (Pinecone, FAISS, Chroma, Milvus, etc.)  
+3. Index organizes vectors for fast retrieval  
+
+Without indexing, every query would be extremely slow.
 
 </details>
 
 ---
 
-<a name="13"></a>
-## 13. Why is it dangerous to embed an entire PDF without chunking?
+<a name="4"></a>
+## 4. Which LangChain object represents a piece of ingested data?
 
 <details>
 <summary>Answer — click to expand</summary>
 
-Embedding a whole PDF as one chunk is bad because:
+The **Document** object.
 
-- Topics get mixed → blurry embedding  
-- Text may exceed token limits  
-- Wasteful computation  
-- No page-level accuracy  
-- Poor retrieval → entire document returned  
+It has:
 
-**In short:**  
-Large chunk = messy, inaccurate retrieval.  
-Small chunk = clear meaning, better results.
+- `page_content` → text  
+- `metadata` → key–value info  
+
+Everything downstream works on this object.
 
 </details>
 
 ---
 
-<a name="14"></a>
-## 14. When should I use different chunking styles?
+<a name="5"></a>
+## 5. What are the two components of a LangChain Document?
 
 <details>
 <summary>Answer — click to expand</summary>
 
-### **Character-based**
-Use when text is clean and you want simple fixed cuts.
+- **page_content** → actual text to embed/search  
+- **metadata** → dictionary (source, page number, author, date, etc.)
 
-### **Recursive (hierarchical)**
-Use for structured docs (PDFs, manuals, reports).  
-Best accuracy.
-
-### **Token-based**
-Use when exact token control matters (embeddings or LLM limits).
-
-**In short:**  
-- Character → simple  
-- Recursive → best  
-- Token-based → most precise
+Both are essential.
 
 </details>
 
 ---
 
-<a name="15"></a>
-## 15. Why does recursive splitting produce more meaningful chunks?
+<a name="6"></a>
+## 6. Why must `page_content` always be a string?
 
 <details>
 <summary>Answer — click to expand</summary>
 
-It splits using larger boundaries first (paragraph → sentence → word → char).  
-This preserves coherence and keeps ideas intact.
+Because tokenizers and embedding models only work on **text**.  
+Images, tables, or JSON must be converted to text first.
 
-Better chunks → better embeddings.
+A fixed string type keeps pipelines predictable and stable.
 
 </details>
 
 ---
 
-<a name="16"></a>
-## 16. Trade-offs of large vs small chunk sizes
+<a name="7"></a>
+## 7. Why does LangChain enforce a fixed Document structure?
 
 <details>
 <summary>Answer — click to expand</summary>
 
-### **Large chunks**
-Pros: more context, fewer vectors, cheaper search  
-Cons: topic mixing, token limits, less accurate retrieval
+A consistent structure ensures all loaders, splitters, databases, and retrievers understand documents the same way.
 
-### **Small chunks**
-Pros: precise retrieval, page-level accuracy  
-Cons: more vectors, more compute, may lose context
+- `page_content` → text for embeddings  
+- `metadata` → extra info like source/page/tags  
 
-Best practice → medium chunk size (200–500 tokens)
+Standardization avoids bugs and custom handling.
 
 </details>
 
 ---
 
-<a name="17"></a>
-## 17. What metadata do common loaders return?
+<a name="8"></a>
+## 8. How does metadata enhance search results?
 
 <details>
 <summary>Answer — click to expand</summary>
 
-### **1. PDF loaders**
-- `source`, `page`, `total_pages`, `title`, `author`, `size`
+Metadata enables:
 
-### **2. HTML/Web loaders**
-- `url`, `title`, `description`, `lang`, `html_path`, `last_modified`
+- filtered retrieval (author, date, type, page)  
+- provenance tracking  
+- better context for answers  
 
-### **3. DOCX loaders**
-- `source`, `style`, `section`, `author`, `created_at`
-
-### **4. Text loaders**
-- `source`, `encoding`, `file_extension`
-
-### **5. OCR loaders**
-- `ocr_confidence`, `image_size`, `page_number`
-
-### **6. CSV/Excel loaders**
-- `row`, `column`, `sheet_name`
-
-### **7. JSON loaders**
-- `key_path`, `record_index`, `schema`
-
-Different file formats = different metadata.
+It improves precision and transparency.
 
 </details>
 
 ---
+
+<a name="9"></a>
+## 9. Difference between CharacterTextSplitter and RecursiveCharacterTextSplitter
+
+<details>
+<summary>Answer — click to expand</summary>
+
+### **CharacterTextSplitter**
+- Cuts by fixed character length  
+- Can break sentences  
+- Single separator (e.g., `\n\n`)
+
+### **RecursiveCharacterTextSplitter**  
+Uses a hierarchy of separators:
+
