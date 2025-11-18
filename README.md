@@ -93,14 +93,4 @@ Without indexing the system would need to compare queries against every vector m
 
 ---
 
-## How to use
-- Paste this `README.md` into your repository root.  
-- GitHub will render the TOC links and `<details>` blocks automatically.  
-- To add more Q&A, copy any section and update the heading, link, and content.
 
----
-
-If you want, I can:
-- Convert this into a separate `FAQ.md` and add a short link from the main README.  
-- Add badges, styling, or a small diagram of the ingestion flow to the README.  
-Which one would you like next?
