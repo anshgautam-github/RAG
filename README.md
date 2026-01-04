@@ -810,3 +810,115 @@ One approach is query refinement, where the system reformulates the query or ask
 Another strategy is diverse retrieval, where the system retrieves documents covering different possible meanings of the query. This increases the chance that at least some retrieved content will be relevant.
 Finally, natural language understanding (NLU) models can be used to infer user intent from limited input, allowing the retriever to refine and improve the retrieval process even when queries are vague.
 </details>
+
+---
+
+## 65. How do you choose the right retriever for a RAG application?
+<details> <summary>Answer — click to expand</summary>
+Choosing the right retriever depends on the type of data you are working with, the nature of user queries, and the available computational resources.
+For complex queries that require a deep understanding of semantic meaning, dense retrieval methods such as BERT-based retrievers or Dense Passage Retrieval (DPR) are more suitable. These methods capture contextual meaning and are ideal for use cases like customer support, research, or technical documentation, where understanding intent matters more than exact keyword matches.
+For simpler tasks that rely heavily on keyword matching, or in scenarios with limited computational resources, sparse retrieval methods such as BM25 or TF-IDF can be effective. These approaches are faster and easier to implement but may fail to retrieve relevant documents that do not share exact keywords with the query.
+The key trade-off is between accuracy and computational cost. In many real-world systems, a hybrid approach combining both dense and sparse retrieval methods is used to balance retrieval quality with efficiency.
+</details>
+---
+
+## 66. What is a hybrid search in the context of RAG?
+<details> <summary>Answer — click to expand</summary>
+Hybrid search is a retrieval strategy that combines both sparse and dense retrieval methods. In this approach, sparse retrieval techniques (such as BM25) are used to quickly identify a broad set of candidate documents based on keyword matching. Dense retrieval is then applied to re-rank or refine these candidates based on semantic similarity.
+This combination allows the system to benefit from the speed and precision of keyword-based search while also leveraging the semantic understanding provided by dense embeddings. Hybrid search is especially useful in large-scale RAG systems where both efficiency and retrieval quality are important.
+</details>
+---
+
+## 67. Do you need a vector database to implement RAG? If not, what are the alternatives?
+<details> <summary>Answer — click to expand</summary>
+A vector database is highly effective for managing dense embeddings in RAG systems, but it is not always strictly necessary.
+Alternatives include traditional databases, which can be sufficient when using sparse retrieval methods or structured data. Relational databases or NoSQL systems like MongoDB can handle keyword-based searches effectively, while systems like Elasticsearch support full-text search for unstructured data. However, these approaches lack deep semantic search capabilities.
+Inverted indices are another alternative, mapping keywords to documents for fast retrieval. While efficient, they do not capture semantic meaning.
+For small-scale systems, even file-based storage with simple search logic may work, though this approach does not scale well and offers limited retrieval capabilities.
+The right choice depends on factors such as dataset size, performance requirements, and whether semantic understanding is needed.
+</details>
+---
+
+## 68. How can you ensure that the retrieved information is relevant and accurate?
+<details> <summary>Answer — click to expand</summary>
+Ensuring retrieval relevance and accuracy requires multiple strategies working together.
+First, it is important to curate a high-quality knowledge base by including reliable and domain-appropriate information. Poor data quality directly impacts retrieval performance.
+Second, the retriever itself can be fine-tuned or adapted to the specific task, improving its ability to return relevant results.
+Re-ranking techniques can also be applied after initial retrieval to reorder documents based on deeper relevance checks. This helps surface the most accurate information before passing it to the generator.
+Feedback loops, such as user feedback or automated evaluation signals, can further refine retrieval quality over time. An example of this approach is Corrective RAG (CRAG), which evaluates and corrects retrieval results dynamically.
+Finally, regular evaluation using metrics such as precision, recall, and F1 score helps monitor and improve retrieval accuracy.
+</details>
+---
+
+## 69. What are some techniques for handling long documents or large knowledge bases in RAG?
+<details> <summary>Answer — click to expand</summary>
+Several techniques can be used to manage long documents or large-scale knowledge bases effectively.
+Chunking breaks long documents into smaller sections, making retrieval more focused and efficient.
+Summarization can be applied to generate condensed versions of documents, allowing the system to work with shorter text while preserving key information.
+Hierarchical retrieval uses a multi-stage approach, first retrieving broad sections and then narrowing down to more specific content.
+Memory-efficient embeddings reduce storage and computation costs by using compact vector representations.
+Indexing and sharding divide the knowledge base into smaller partitions distributed across systems, enabling parallel processing and faster retrieval in large-scale environments.
+</details>
+---
+
+## 70. How can you optimize the performance of a RAG system in terms of both accuracy and efficiency?
+<details> <summary>Answer — click to expand</summary>
+Optimizing a RAG system requires balancing retrieval quality with computational efficiency.
+Fine-tuning retriever and generator models using task-specific data improves accuracy for domain-specific queries.
+Efficient indexing structures, such as inverted indices or optimized vector indexes, speed up retrieval operations.
+Caching frequently accessed data reduces repeated computation and improves response latency.
+Reducing unnecessary retrieval steps by improving retriever precision ensures that only the most relevant documents are passed to the generator.
+Hybrid search methods can also be used to combine the strengths of sparse and dense retrieval, achieving a balance between speed and semantic accuracy.
+</details>
+---
+
+## 71. What are the different chunking techniques for breaking down documents, and what are their pros and cons?
+<details> <summary>Answer — click to expand</summary>
+Several chunking strategies are commonly used in RAG systems.
+Fixed-length chunking splits text into uniform sizes, which is easy to implement but may break logical units of meaning.
+Sentence-based chunking preserves sentence boundaries, making it suitable for fine-grained analysis, but may produce too many small chunks with limited context.
+Paragraph-based chunking maintains broader context but can result in chunks that are too large for efficient retrieval.
+Semantic chunking groups text based on meaning or topic, preserving coherence but requiring more complex analysis.
+Sliding window chunking uses overlapping chunks to preserve context across boundaries, improving retrieval quality at the cost of increased computation and redundancy.
+</details>
+---
+
+## 72. What are the trade-offs between chunking documents into larger versus smaller chunks?
+<details> <summary>Answer — click to expand</summary>
+Smaller chunks, such as sentences or short paragraphs, reduce the risk of diluting important information when compressed into a single embedding vector. They improve retrieval precision but may lose long-range dependencies, making it harder to resolve references across chunks.
+Larger chunks preserve more context and support richer understanding, but they can become less focused. Important details may be overshadowed when too much information is encoded into a single vector, reducing retrieval precision.
+Choosing the right chunk size requires balancing contextual completeness with retrieval accuracy.
+</details>
+---
+
+## 73. What is late chunking and how is it different from traditional chunking methods?
+<details> <summary>Answer — click to expand</summary>
+Late chunking addresses the limitations of traditional chunking by delaying the chunking process until after document encoding.
+In traditional chunking, documents are split first and each chunk is embedded independently, which can lead to loss of long-range contextual dependencies.
+Late chunking first applies the transformer layers of the embedding model to the entire document or as much of it as possible, generating token-level embeddings that capture global context. Chunks are then formed by pooling these token embeddings, producing chunk embeddings that retain document-wide context.
+This approach preserves long-range dependencies and improves embedding quality, making retrieval and generation more accurate.
+</details>
+---
+
+## 74. Explain the concept of contextualization in RAG and its impact on performance.
+<details> <summary>Answer — click to expand</summary>
+Contextualization in RAG refers to ensuring that retrieved information is closely aligned with the user’s query. By providing highly relevant context to the generator, the system produces more accurate and useful responses.
+Effective contextualization reduces irrelevant retrievals and lowers the risk of incorrect outputs. Techniques such as using an LLM to validate retrieved documents before generation, as seen in Corrective RAG (CRAG), help ensure that only high-quality context is used.
+Better contextualization directly improves both response relevance and overall system reliability.
+</details>
+---
+
+## 75. How can you address potential biases in retrieved information or in the LLM’s generation?
+<details> <summary>Answer — click to expand</summary>
+Addressing bias starts with building a carefully curated knowledge base that prioritizes objective and balanced sources.
+The retriever can also be trained or tuned to favor diverse and unbiased content. In addition, post-retrieval checks can be introduced to detect and mitigate biased information before it reaches the generator.
+Another approach is to use an agent or secondary model to review generated outputs for bias and enforce neutrality, helping ensure fair and balanced responses.
+</details>
+---
+
+## 76. Discuss the challenges of handling dynamic or evolving knowledge bases in RAG.
+<details> <summary>Answer — click to expand</summary>
+One major challenge is keeping indexed data synchronized with the latest information. This requires reliable update pipelines to refresh embeddings and indexes as content changes.
+Version control is essential to manage multiple iterations of documents and prevent inconsistencies during retrieval.
+Another challenge is incorporating new information in real time without frequently retraining the language model, which is computationally expensive. Efficient re-indexing, incremental updates, and smart retrieval strategies are required to keep the system accurate and up to date as the knowledge base evolves.
+</details>
