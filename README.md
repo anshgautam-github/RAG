@@ -398,3 +398,12 @@ Pick fields that make filtering and provenance practical for your application.
 </details>
 
 ---
+## 21. Can you explain what Retrieval-Augmented Generation (RAG) is and why it’s important?
+
+<details>
+<summary>Answer — click to expand</summary>
+
+Retrieval-Augmented Generation is an approach that combines large language models (LLMs) with external knowledge retrieval to produce more accurate, contextually grounded outputs. Instead of relying solely on the knowledge baked into an LLM’s parameters, RAG queries external data sources — like databases, APIs, or indexed documents — to retrieve relevant information. This retrieved content is then integrated into the generative process, enabling the model to deliver responses that are not only contextually relevant but also more factually reliable. This approach is particularly valuable for domain-specific applications, complex Q&A systems, and scenarios where up-to-date or proprietary knowledge is required.
+</details>
+
+---
