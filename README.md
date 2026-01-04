@@ -732,3 +732,81 @@ Customizing a RAG (Retrieval-Augmented Generation) chain in LangChain involves c
 <details> <summary>Answer — click to expand</summary>
 Using context from retrieved documents in the generation process is important because it ensures that the generated responses are relevant, accurate, and grounded in specific information. This approach prevents the generation model from producing generic or uninformed answers by anchoring its output in real, retrieved content. By incorporating document context, the model can provide more precise and useful answers, especially in scenarios requiring detailed or specialized knowledge. This practice improves the quality of the generated responses by making them more specific, informed, and aligned with the user’s query, ultimately enhancing the effectiveness and reliability of the RAG system.
 </details>
+
+---
+
+## 56. Explain the main parts of a RAG system and how they work.
+<details> <summary>Answer — click to expand</summary>
+A RAG (retrieval-augmented generation) system has two main components: the retriever and the generator.
+The retriever searches for and collects relevant information from external sources, such as databases, documents, or websites. Its job is to identify content that is most relevant to the user’s query and provide this information to the next stage of the pipeline.
+The generator, usually an advanced language model, uses the retrieved information to create clear and accurate text. Instead of relying only on its internal knowledge, the generator grounds its response in the external content supplied by the retriever.
+The retriever ensures that the system has access to up-to-date and relevant information, while the generator combines this retrieved context with its language understanding to produce high-quality answers. Together, they enable more accurate and reliable responses than the generator could produce on its own.
+</details>
+---
+
+## 57. What are the main benefits of using RAG instead of just relying on an LLM’s internal knowledge?
+<details> <summary>Answer — click to expand</summary>
+When relying only on an LLM’s built-in knowledge, the system is limited to what the model was trained on, which may be outdated or lack sufficient detail for specific domains.
+RAG systems provide a significant advantage by retrieving fresh and relevant information from external sources at query time. This leads to more accurate, timely, and context-aware responses.
+Another key benefit is the reduction of hallucinations—situations where the model generates incorrect or fabricated information. Because responses are grounded in retrieved data, the likelihood of factual errors is reduced. RAG is especially valuable in domains such as law, medicine, and technology, where up-to-date and specialized knowledge is critical.
+</details>
+---
+
+## 58. What types of external knowledge sources can RAG use?
+<details> <summary>Answer — click to expand</summary>
+RAG systems can retrieve information from both structured and unstructured external knowledge sources.
+Structured sources include databases, APIs, and knowledge graphs, where information is organized in a well-defined format and can be queried efficiently.
+Unstructured sources consist of large collections of text such as documents, websites, reports, and archives. These sources require natural language processing techniques to extract and understand relevant information.
+This flexibility allows RAG systems to be adapted to different domains. For example, legal applications may use case law databases, while medical systems may rely on research papers, clinical guidelines, or trial data.
+</details>
+---
+
+## 59. Does prompt engineering matter in a RAG system?
+<details> <summary>Answer — click to expand</summary>
+Prompt engineering plays an important role in ensuring that the language model effectively uses the retrieved information. The way a prompt is designed can significantly influence the relevance, accuracy, and clarity of the generated response.
+Using specific system prompts can guide the model’s behavior. For example, instead of a generic instruction like “Answer the question,” a more constrained prompt such as “Answer the question using only the provided context” helps reduce hallucinations by limiting the model to retrieved information.
+Few-shot prompting provides examples of desired responses before the model generates its own answer, helping it understand the expected style and format. Chain-of-thought prompting encourages the model to reason step by step, which is especially useful for complex questions that require logical reasoning.
+</details>
+---
+
+## 60. How does the retriever work in a RAG system, and what are common retrieval methods?
+<details> <summary>Answer — click to expand</summary>
+In a RAG system, the retriever is responsible for gathering relevant information from external sources to support the generation process.
+One common retrieval method is sparse retrieval, which relies on keyword matching techniques such as TF-IDF or BM25. These methods are efficient and simple but may struggle to capture deeper semantic meaning.
+Another approach is dense retrieval, which uses neural embeddings to represent both documents and queries in a shared vector space. Techniques such as BERT-based embeddings or Dense Passage Retrieval (DPR) enable more semantic-aware matching, often resulting in higher retrieval accuracy.
+The choice of retrieval method directly impacts the overall effectiveness of the RAG system.
+</details>
+---
+
+## 61. What are the challenges of combining retrieved information with LLM generation?
+<details> <summary>Answer — click to expand</summary>
+One challenge in combining retrieval with generation is ensuring that the retrieved information is highly relevant. Irrelevant or noisy documents can confuse the language model and degrade response quality.
+Another issue arises when retrieved information conflicts with the model’s internal knowledge. Resolving these inconsistencies in a way that produces accurate and coherent responses is non-trivial.
+Additionally, retrieved content may differ in style, structure, or formatting from the model’s usual output. Integrating such information smoothly into a natural and readable response requires careful prompt design and preprocessing.
+</details>
+---
+
+## 62. What is the role of a vector database in a RAG system?
+<details> <summary>Answer — click to expand</summary>
+A vector database plays a central role in managing and storing dense embeddings of text in a RAG system. These embeddings are numerical representations that capture semantic meaning, produced by models such as BERT or OpenAI embeddings.
+When a user submits a query, its embedding is compared against stored embeddings using similarity search. This allows the system to efficiently identify documents that are most relevant to the query.
+By enabling fast and accurate similarity searches, vector databases improve both retrieval speed and retrieval quality, which directly impacts the effectiveness of the RAG system.
+</details>
+---
+
+## 63. What are some common ways to evaluate RAG systems?
+<details> <summary>Answer — click to expand</summary>
+Evaluating a RAG system requires assessing both the retrieval and generation components.
+For the retriever, metrics such as precision (the proportion of retrieved documents that are relevant) and recall (the proportion of relevant documents that are successfully retrieved) are commonly used.
+For the generator, text quality metrics such as BLEU and ROUGE can be applied by comparing generated responses with human-written references. In question-answering tasks, metrics like F1 score, precision, and recall are often used to evaluate end-to-end performance.
+Together, these metrics provide insight into how well the RAG system retrieves relevant information and generates accurate responses.
+</details>
+---
+
+## 64. How do you handle ambiguous or incomplete queries in a RAG system to ensure relevant results?
+<details> <summary>Answer — click to expand</summary>
+Handling ambiguous or incomplete queries requires strategies that help the system retrieve useful information despite uncertainty in the user’s input.
+One approach is query refinement, where the system reformulates the query or asks follow-up questions to clarify user intent. This can also involve suggesting multiple interpretations for the user to choose from.
+Another strategy is diverse retrieval, where the system retrieves documents covering different possible meanings of the query. This increases the chance that at least some retrieved content will be relevant.
+Finally, natural language understanding (NLU) models can be used to infer user intent from limited input, allowing the retriever to refine and improve the retrieval process even when queries are vague.
+</details>
