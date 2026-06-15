@@ -30,11 +30,7 @@ class ThresholdSemanticChunker:
 
     def split(self, text: str):
 
-        sentences = [
-            s.strip()
-            for s in text.split(".")
-            if s.strip()
-        ]
+        sentences = [ s.strip() for s in text.split(".") if s.strip()]
 
         if len(sentences) == 0:
             return []
@@ -46,26 +42,16 @@ class ThresholdSemanticChunker:
 
         for i in range(1, len(sentences)):
 
-            sim = cosine_similarity(
-                [embeddings[i - 1]],
-                [embeddings[i]]
-            )[0][0]
+            sim = cosine_similarity( [embeddings[i - 1]], [embeddings[i]])[0][0]
 
             if sim >= self.threshold:
-
                 current_chunk.append(
                     sentences[i]
                 )
 
             else:
-
-                chunks.append(
-                    ". ".join(current_chunk) + "."
-                )
-
-                current_chunk = [
-                    sentences[i]
-                ]
+                chunks.append(". ".join(current_chunk) + ".")
+                current_chunk = [sentences[i]]
 
         chunks.append(
             ". ".join(current_chunk) + "."
@@ -79,12 +65,9 @@ class ThresholdSemanticChunker:
 
         for doc in docs:
 
-            chunks = self.split(
-                doc.page_content
-            )
+            chunks = self.split(doc.page_content)
 
             for chunk in chunks:
-
                 result.append(
                     Document(
                         page_content=chunk,
