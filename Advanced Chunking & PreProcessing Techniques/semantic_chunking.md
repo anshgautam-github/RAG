@@ -1,6 +1,8 @@
 # The goal is:
-# Take a large text. Understand the meaning of each sentence using embeddings
-# Compare neighboring sentences semantically.Group related sentences together into chunks
+Take a large text. 
+Understand the meaning of each sentence using embeddings
+Compare neighboring sentences semantically.
+Group related sentences together into chunks
 
 
 

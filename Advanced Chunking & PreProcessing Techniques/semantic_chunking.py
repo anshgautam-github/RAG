@@ -23,7 +23,7 @@ embeddings=model.encode(sentences)
 # Step 3: Initialize parameters
 threshold = 0.7  # control chunk tightness
 chunks = []
-current_chunk=[sentences[0]]
+current_chunk=[sentences[0]] # list so we can append sentences to it until we decide to start a new chunk
 
 ## Step 4: Semantic grouping based on threshold
 
@@ -36,8 +36,9 @@ for i in range(1, len(sentences)):
     if sim>=threshold:
         current_chunk.append(sentences[i])
     else:
-        chunks.append(" ".join(current_chunk))
-        current_chunk=[sentences[i]]
+        chunks.append(" ".join(current_chunk))  # The new sentence does not belong to the current chunk, so close the current chunk and start a new one
+        #join means:"Take all strings inside this list and join them together using a space (" ") between each one.
+        current_chunk=[sentences[i]] 
 
 # Append the last chunk
 chunks.append(" ".join(current_chunk))
