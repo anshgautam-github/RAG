@@ -95,21 +95,9 @@ class ThresholdSemanticChunker:
         return result
 
 
-# ============================================================
-# LOAD DOCUMENT
-# ============================================================
 
-loader = TextLoader(
-    "data.txt",
-    encoding="utf-8"
-)
-
+loader = TextLoader("data.txt", encoding="utf-8")
 documents = loader.load()
-
-
-# ============================================================
-# SEMANTIC CHUNKING
-# ============================================================
 
 chunker = ThresholdSemanticChunker(
     threshold=0.70
@@ -119,101 +107,35 @@ chunked_docs = chunker.split_documents(
     documents
 )
 
-print(f"\nTotal Chunks: {len(chunked_docs)}")
-
-for i, doc in enumerate(chunked_docs[:5]):
-    print(f"\nChunk {i+1}")
-    print(doc.page_content)
-
-
-# ============================================================
-# EMBEDDING MODEL
-# ============================================================
-
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
+vectorstore = FAISS.from_documents( chunked_docs, embedding_model)
+retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
-# ============================================================
-# VECTOR STORE
-# ============================================================
-
-vectorstore = FAISS.from_documents(
-    chunked_docs,
-    embedding_model
-)
-
-
-# ============================================================
-# RETRIEVER
-# ============================================================
-
-retriever = vectorstore.as_retriever(
-    search_kwargs={
-        "k": 3
-    }
-)
-
-
-# ============================================================
-# LLM
-# ============================================================
-
-llm = init_chat_model(
-    model="groq:gemma2-9b-it",
-    temperature=0.4
-)
-
-
-# ============================================================
-# PROMPT
-# ============================================================
+llm = init_chat_model(model="groq:gemma2-9b-it",temperature=0.4)
 
 template = """
-Answer the question using ONLY the provided context.
+        Answer the question using ONLY the provided context.
 
-Context:
-{context}
+        Context:
+        {context}
 
-Question:
-{input}
+        Question:
+        {input}
 """
 
 prompt = PromptTemplate.from_template(
     template
 )
 
-
-# ============================================================
-# DOCUMENT CHAIN
-# ============================================================
-
-document_chain = create_stuff_documents_chain(
-    llm,
-    prompt
-)
-
-
-# ============================================================
-# RETRIEVAL CHAIN
-# ============================================================
-
-retrieval_chain = create_retrieval_chain(
-    retriever,
-    document_chain
-)
-
-
-# ============================================================
-# CHAT LOOP
-# ============================================================
+document_chain = create_stuff_documents_chain(llm, prompt )
+retrieval_chain = create_retrieval_chain( retriever,document_chain)
 
 while True:
 
-    question = input(
-        "\nAsk Question (type 'exit' to quit): "
-    )
+    question = input("\nAsk Question (type 'exit' to quit): ")
 
     if question.lower() == "exit":
         break
