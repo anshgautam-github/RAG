@@ -15,3 +15,7 @@ docs = [
 embedding_model = HuggingFaceEmbeddings(model_name="all-MINI-L6-v2")
 dense_vectorstore = FAISS.from_documents(docs,embedding_model)
 dense_retriever = dense_vectorstore.as_retriever()
+
+#Sparse Retriever (BM25)
+sparse_retriever = BM25Retriever.from_documents(docs)
+sparse_retriever.k=3
