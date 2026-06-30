@@ -19,3 +19,9 @@ dense_retriever = dense_vectorstore.as_retriever()
 #Sparse Retriever (BM25)
 sparse_retriever = BM25Retriever.from_documents(docs)
 sparse_retriever.k=3
+
+#Combining both with the Ensemble Retriever 
+hybrid_retriever = EnsembleRetriever(
+    retrievers = [dense_retriever,sparse_retriever],
+    weight = [0.7 , 0.3]
+)
